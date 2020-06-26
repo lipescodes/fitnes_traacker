@@ -5,13 +5,20 @@ import { Subject } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { UIservice } from '../shared/ui.service';
 
 @Injectable()
 export class AuthService{
   authChange = new Subject<boolean>();
   private isAuthenticated = false;
 
-  constructor(private router: Router, private afAuth: AngularFireAuth, private trainingService: TrainingService){}
+  constructor(private router: Router,
+              private afAuth: AngularFireAuth,
+              private trainingService: TrainingService,
+              private snackbar: MatSnackBar,
+              private uiService: UIservice
+              ){}
 
   initAuthListener() {
     this.afAuth.authState.subscribe(user => {
@@ -29,33 +36,36 @@ export class AuthService{
   }
 
   registerUser(authData: AuthData){
+    this.uiService.loadingStateChanged.next(true);
     this.afAuth.auth.createUserWithEmailAndPassword(
       authData.email,
       authData.password
     ).then(result => {
       console.log(result);
+      this.uiService.loadingStateChanged.next(false);
     })
     .catch(error => {
-      console.log(error);
+      this.uiService.loadingStateChanged.next(false);
+      this.uiService.showSnackbar(error.message, null, 3000);
     });
     //this.authSuccesfully();
   }
 
   login(authData: AuthData) {
-   this.afAuth.auth
-     .signInWithEmailAndPassword(
-       authData.email,
-       authData.password
-      )
-     .then((result) => {
-       console.log(result);
+    this.uiService.loadingStateChanged.next(true);
+    this.afAuth.auth
+      .signInWithEmailAndPassword(
+        authData.email,
+        authData.password
+        )
+      .then((result) => {
+        this.uiService.loadingStateChanged.next(false);
 
-     })
-     .catch((error) => {
-       console.log(error);
-     });
-
-
+      })
+      .catch((error) => {
+        this.uiService.loadingStateChanged.next(false);
+        this.uiService.showSnackbar(error.message, null, 3000);
+      });
   }
 
   logout(){
