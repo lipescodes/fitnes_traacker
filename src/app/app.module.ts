@@ -18,6 +18,8 @@ import { AuthService } from './auth/auth.service';
 import { TrainingService } from './training/training.service';
 import { environment } from '../environments/environment';
 import { UIservice } from './shared/ui.service';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './app.reducer';
 
 
 
@@ -26,7 +28,7 @@ import { UIservice } from './shared/ui.service';
     AppComponent,
     WelcomeComponent,
     HeaderComponent,
-    SidenavListComponent
+    SidenavListComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,7 +38,8 @@ import { UIservice } from './shared/ui.service';
     FlexLayoutModule,
     AngularFireModule.initializeApp(environment.firebase),
     AuthModule,
-    AngularFirestoreModule
+    AngularFirestoreModule,
+    StoreModule.forRoot(reducers)
   ],
   providers: [AuthService, TrainingService, UIservice],
   bootstrap: [AppComponent],
